@@ -599,7 +599,6 @@ var MANDATORY_LABELS = {
   f_phone:'Phone', f_agent:'Agent', f_quality:'Quality', f_status:'Status'
 };
 
-var ANTHROPIC_KEY = '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';
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbxaN2SMM6U7oCcY2izSHkrhocsJwCQW4NoGsV_N0MFR0pUPUQMg2qkG7CaM65XtM_yrsw/exec';
 
 var sessionAgent = '';
@@ -709,7 +708,7 @@ function stopRec() {
   }
 }
 
-// ── PARSE TRANSCRIPT VIA ANTHROPIC API ───────────────────────
+// ── PARSE TRANSCRIPT VIA GAS BACKEND (Claude API) ───────────
 async function parseAudio() {
   var transcript = finalTranscript.trim() ||
     document.getElementById('transcriptBox').textContent.trim();
@@ -722,55 +721,24 @@ async function parseAudio() {
   document.getElementById('parseBtnText').innerHTML = '<span class="spinner"></span> Parsing…';
   document.getElementById('parseBtn').disabled = true;
 
-  var today = new Date().toISOString().split('T')[0];
-
-  var prompt = 'You are a hotel reservations assistant for Red Coral Travel, India. ' +
-    'Parse this spoken enquiry transcript into structured JSON. Today is ' + today + '. ' +
-    'Agent may speak in English, Hindi, or Hinglish. ' +
-    'RESORTS: Abbotsford, BBTG, Bijapur, Devra, Eagles Nest, Hoongla, Nine Furlongs, Parvada, RNK, Sariska, Satya Andamans, Satya 6, Singinawa, The Sen, Varenya, Anantya, Baghtola, Coco Lagoon, Machaan, Redcoral, Rewa, Stone Hedge, TnT. ' +
-    'SOURCE — infer: call/phone→Call, whatsapp/WA/message→Whatsapp, email→Email, instagram/facebook→FB/Insta, website→Website, referred→Referral, meta ad→Meta Ad. ' +
-    'AGENTS: Sushant, Priyal, Preeti, Dominic, Maruti, Sahadev, Shivani, Shobha, Vinay. ' +
-    'Convert relative dates to YYYY-MM-DD. Extract phone digits only. ' +
-    'Return ONLY valid JSON no markdown: ' +
-    '{"resort":"","source":"","checkin":"","checkout":"","rooms":"","room_category":"","meal_plan":"","addons":"","guest_name":"","phone":"","email":"","agency":"","adults":"","kids":"","infants":"","segment":"","type":"","rate_type":"","campaign":"","referral":"","rate_offered":"","agent":"","quality":"Seeking Info","status":"Open","remarks":"","follow_up_on":"","follow_up_by":"","reason":""}' +
-    '\nTranscript: "' + transcript + '"';
-
   try {
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+    var result = await callBackend({
+      action: 'transcribe',
+      transcript: transcript
     });
 
-    var data = await response.json();
-    console.log('API response:', JSON.stringify(data).substring(0,500));
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    var text = data.content && data.content[0] ? data.content[0].text : '';
-    console.log('Claude text:', text);
-    var clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
-    var start = clean.indexOf('{');
-    var end   = clean.lastIndexOf('}');
-    if (start === -1 || end === -1) throw new Error('No JSON in response: ' + clean.substring(0,200));
-    var parsed = JSON.parse(clean.substring(start, end+1));
-
-    fillForm(parsed);
-    setStatus('success', 'Parsed — review and correct if needed');
-    switchMode('form');
-    setTimeout(function(){
-      document.getElementById('formPanel').scrollIntoView({behavior:'smooth'});
-    }, 200);
-
+    if (result.success && result.data) {
+      fillForm(result.data);
+      setStatus('success', 'Parsed — review and correct if needed');
+      switchMode('form');
+      setTimeout(function(){
+        document.getElementById('formPanel').scrollIntoView({behavior:'smooth'});
+      }, 200);
+    } else {
+      setStatus('error', 'Parse failed: ' + (result.error || 'Unknown error'));
+    }
   } catch(err) {
-    setStatus('error', 'Parse failed: ' + err.message);
+    setStatus('error', 'Error: ' + err.message);
   }
 
   document.getElementById('parseBtnText').textContent = '✦ Parse with AI';
