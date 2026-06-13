@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC Enquiry App</title>
+<style>
+:root {
+  --ink:       #1C1C1E;
+  --ink-soft:  #6B6B6B;
+  --ink-faint: #ADADAD;
+  --bg:        #F5F4F1;
+  --surface:   #FFFFFF;
+  --border:    #E2DDD8;
+  --coral:     #E07055;
+  --coral-dk:  #C45C42;
+  --green:     #2D9E6B;
+  --red:       #DC2626;
+  --radius:    10px;
+  --shadow:    0 2px 8px rgba(0,0,0,0.07);
+  --font:      -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); font-size: 14px; }
+
+/* AGENT SELECT SCREEN */
+.agent-screen {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.agent-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 100%; max-width: 380px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.agent-logo {
+  width: 56px; height: 56px;
+  background: var(--coral);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 20px; color: white;
+  margin: 0 auto 16px;
+}
+.agent-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.agent-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 24px; }
+.agent-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 8px;
+}
+.agent-btn {
+  padding: 12px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; color: var(--ink);
+  transition: all 0.15s;
+}
+.agent-btn:hover, .agent-btn.selected {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: white;
+}
+
+/* HEADER */
+.header {
+  background: var(--ink); color: white;
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+  width: 30px; height: 30px; background: var(--coral);
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px; color: white;
+}
+.header-name { font-weight: 600; font-size: 14px; }
+.header-agent { font-size: 11px; color: #aaa; }
+.queue-pill {
+  background: var(--coral); color: white;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+
+/* MAIN */
+.main { max-width: 680px; margin: 0 auto; padding: 16px 14px 100px; }
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex; background: var(--border);
+  border-radius: var(--radius); padding: 3px; margin-bottom: 16px;
+}
+.mode-btn {
+  flex: 1; padding: 9px; border: none; background: none;
+  border-radius: 8px; font-size: 13px; font-weight: 500;
+  cursor: pointer; color: var(--ink-soft);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all 0.15s;
+}
+.mode-btn.active {
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+/* VOICE PANEL */
+.panel { display: none; }
+.panel.active { display: block; }
+
+.mic-card {
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 28px 16px;
+  text-align: center;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+.mic-card.recording { border-color: var(--coral); background: #FDF2EF; }
+
+.mic-btn {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: var(--coral); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  box-shadow: 0 4px 16px rgba(224,112,85,0.3);
+  transition: all 0.15s;
+}
+.mic-btn:hover { transform: scale(1.05); background: var(--coral-dk); }
+.mic-btn.recording { background: var(--red); animation: pulse 1.2s infinite; }
+@keyframes pulse {
+  0%,100% { box-shadow: 0 4px 16px rgba(220,38,38,0.3); }
+  50%      { box-shadow: 0 4px 24px rgba(220,38,38,0.55); }
+}
+.mic-label { font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+.rec-timer { font-size: 22px; font-weight: 700; color: var(--red); display: none; }
+.mic-card.recording .rec-timer { display: block; }
+.mic-card.recording .mic-hint { display: none; }
+.mic-hint { font-size: 11px; color: var(--ink-faint); line-height: 1.5; }
+
+.transcript-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  min-height: 70px;
+  font-size: 13px; line-height: 1.6;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+.transcript-box.has-text { color: var(--ink); }
+
+.parse-btn {
+  width: 100%; padding: 12px;
+  background: var(--coral); color: white;
+  border: none; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 16px;
+}
+.parse-btn:hover { background: var(--coral-dk); }
+.parse-btn:disabled { background: var(--border); color: var(--ink-faint); cursor: not-allowed; }
+
+/* STATUS BAR */
+.status-bar {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  margin-bottom: 14px;
+  display: none;
+  align-items: center; gap: 8px;
+}
+.status-bar.visible { display: flex; }
+.status-bar.loading { background: #FDF9F7; border: 1px solid #F0C4B8; color: var(--coral); }
+.status-bar.success { background: #EDF7F2; border: 1px solid #B6E2CF; color: var(--green); }
+.status-bar.error   { background: #FEF3F2; border: 1px solid #FECDCA; color: var(--red); }
+
+/* FORM */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px; margin-bottom: 14px;
+}
+.card-title {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--ink-faint); margin-bottom: 12px;
+}
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.grid1 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.span2 { grid-column: span 2; }
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+label { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
+label .req { color: var(--coral); }
+
+input, select, textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px; font-family: var(--font);
+  color: var(--ink); background: var(--surface);
+  width: 100%; transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--coral);
+}
+input.ai { background: #FDF9F7; border-color: #F0C4B8; }
+textarea { resize: vertical; min-height: 60px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  padding-right: 26px;
+}
+
+/* MANDATORY STRIP */
+.req-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.req-chip {
+  font-size: 11px; padding: 3px 9px;
+  border-radius: 20px; border: 1px solid var(--border);
+  background: #F5F4F1; color: var(--ink-soft);
+}
+.req-chip.ok  { background: #EDF7F2; color: var(--green); border-color: #B6E2CF; }
+.req-chip.bad { background: #FEF3F2; color: var(--red); border-color: #FECDCA; }
+
+/* ADD BUTTON */
+.add-btn {
+  width: 100%; padding: 13px;
+  background: var(--ink); color: white;
+  border: none; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  margin-bottom: 20px;
+}
+.add-btn:hover { background: #333; }
+
+/* QUEUE */
+.queue-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.queue-title { font-size: 13px; font-weight: 600; }
+.submit-btn {
+  padding: 9px 18px;
+  background: var(--green); color: white;
+  border: none; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.submit-btn:hover { background: #247A55; }
+.submit-btn:disabled { background: var(--border); color: var(--ink-faint); cursor: not-allowed; }
+
+.empty-queue {
+  text-align: center; padding: 20px;
+  color: var(--ink-faint); font-size: 13px;
+  border: 1px dashed var(--border); border-radius: var(--radius);
+}
+
+.q-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; margin-bottom: 8px;
+}
+.q-card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 7px;
+}
+.q-resort { font-weight: 600; font-size: 14px; }
+.q-guest  { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.q-actions { display: flex; gap: 6px; }
+.q-edit, .q-del {
+  padding: 3px 9px; border-radius: 5px;
+  font-size: 11px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg); color: var(--ink-soft);
+}
+.q-del { color: var(--red); border-color: #FECDCA; }
+.q-edit:hover { background: var(--ink); color: white; border-color: var(--ink); }
+.q-del:hover  { background: var(--red); color: white; }
+.q-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.q-chip {
+  font-size: 11px; padding: 2px 7px;
+  background: var(--bg); border-radius: 4px; color: var(--ink-soft);
+}
+.q-chip strong { color: var(--ink); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: white;
+  padding: 10px 22px; border-radius: 28px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  display: none; z-index: 300;
+}
+.toast.show { display: block; }
+.toast.ok  { background: var(--green); }
+.toast.err { background: var(--red); }
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.6s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+  .span2 { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- AGENT SELECT -->
+<div id="agentScreen" class="agent-screen">
+  <div class="agent-card">
+    <div class="agent-logo">RC</div>
+    <div class="agent-title">RC Enquiry App</div>
+    <div class="agent-sub">Who's logging enquiries today?</div>
+    <div class="agent-grid" id="agentGrid"></div>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until agent selected) -->
+<div id="appMain" style="display:none">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">RC</div>
+      <div>
+        <div class="header-name">Enquiry Entry</div>
+        <div class="header-agent" id="headerAgent">—</div>
+      </div>
+    </div>
+    <div class="queue-pill" onclick="scrollToQueue()">
+      Queue: <span id="queueCount">0</span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- MODE TOGGLE -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btnVoice" onclick="switchMode('voice')">
+        🎙 Voice Input
+      </button>
+      <button class="mode-btn" id="btnForm" onclick="switchMode('form')">
+        📋 Manual Form
+      </button>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-bar" id="statusBar">
+      <span id="statusIcon">✦</span>
+      <span id="statusText"></span>
+    </div>
+
+    <!-- VOICE PANEL -->
+    <div class="panel active" id="voicePanel">
+      <div class="mic-card" id="micCard">
+        <button class="mic-btn" id="micBtn" onclick="toggleRec()">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <div class="mic-label" id="micLabel">Tap to record</div>
+        <div class="rec-timer" id="recTimer">0:00</div>
+        <div class="mic-hint">Speak naturally — resort name, dates, guests, name, number, source<br>English or Hinglish both work</div>
+      </div>
+
+      <div class="transcript-box" id="transcriptBox">Recording will appear here after you stop…</div>
+
+      <button class="parse-btn" id="parseBtn" onclick="parseAudio()" disabled>
+        <span id="parseBtnText">✦ Parse with Gemini AI</span>
+      </button>
+    </div>
+
+    <!-- FORM (always shown below) -->
+    <div class="panel active" id="formPanel">
+
+      <div class="req-strip" id="reqStrip"></div>
+
+      <!-- ENQUIRY DETAILS -->
+      <div class="card">
+        <div class="card-title">Enquiry Details</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Resort <span class="req">*</span></label>
+            <select id="f_resort" onchange="updateStrip()">
+              <option value="">— Select —</option>
+              <optgroup label="Reservations">
+                <option>Abbotsford</option><option>BBTG</option><option>Bijapur</option>
+                <option>Devra</option><option>Eagles Nest</option><option>Hoongla</option>
+                <option>Nine Furlongs</option><option>Parvada</option><option>RNK</option>
+                <option>Sariska</option><option>Satya Andamans</option><option>Satya 6</option>
+                <option>Singinawa</option><option>The Sen</option><option>Varenya</option>
+              </optgroup>
+              <optgroup label="Sales &amp; Marketing">
+                <option>Anantya</option><option>Baghtola</option><option>Coco Lagoon</option>
+                <option>Machaan</option><option>Redcoral</option><option>Rewa</option>
+                <option>Stone Hedge</option><option>TnT</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field">
+            <label>Source <span class="req">*</span></label>
+            <select id="f_source" onchange="updateStrip()">
+              <option value="">— Select —</option>
+              <option>Call</option><option>Whatsapp</option><option>Email</option>
+              <option>FB/Insta</option><option>Website</option><option>Referral</option>
+              <option>Meta Ad</option><option>OTA</option><option>Others</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Check In</label>
+            <input type="date" id="f_checkin">
+          </div>
+          <div class="field">
+            <label>Check Out</label>
+            <input type="date" id="f_checkout">
+          </div>
+          <div class="field">
+            <label>Rooms</label>
+            <input type="number" id="f_rooms" min="1" placeholder="1">
+          </div>
+          <div class="field">
+            <label>Room Category</label>
+            <input type="text" id="f_roomcat" placeholder="e.g. Deluxe">
+          </div>
+          <div class="field">
+            <label>Meal Plan</label>
+            <input type="text" id="f_mealplan" placeholder="CP / MAP / AP">
+          </div>
+          <div class="field">
+            <label>Add Ons</label>
+            <input type="text" id="f_addons" placeholder="Safari, Transfers…">
+          </div>
+        </div>
+      </div>
+
+      <!-- GUEST -->
+      <div class="card">
+        <div class="card-title">Guest Details</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Guest / TA Name <span class="req">*</span></label>
+            <input type="text" id="f_guest" placeholder="Full name" oninput="updateStrip()">
+          </div>
+          <div class="field">
+            <label>Contact No <span class="req">*</span></label>
+            <input type="tel" id="f_phone" placeholder="Mobile number" oninput="updateStrip()">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="f_email" placeholder="email@example.com">
+          </div>
+          <div class="field">
+            <label>Agency</label>
+            <input type="text" id="f_agency" placeholder="Travel agency">
+          </div>
+        </div>
+        <div class="grid3" style="margin-top:10px">
+          <div class="field"><label>Adults</label><input type="number" id="f_adults" min="0" placeholder="0"></div>
+          <div class="field"><label>Kids</label><input type="number" id="f_kids" min="0" placeholder="0"></div>
+          <div class="field"><label>Infants</label><input type="number" id="f_infants" min="0" placeholder="0"></div>
+        </div>
+      </div>
+
+      <!-- CLASSIFICATION -->
+      <div class="card">
+        <div class="card-title">Classification</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Segment</label>
+            <select id="f_segment">
+              <option value="">— Select —</option>
+              <option>FIT</option><option>GIT</option><option>MICE</option>
+              <option>Domestic</option><option>International</option>
+              <option>Agent(TA)</option><option>Direct</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <select id="f_type">
+              <option value="">— Select —</option>
+              <option>Leisure</option><option>Business</option>
+              <option>Honeymoon</option><option>Family</option><option>Group</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Rate Type</label>
+            <select id="f_ratetype">
+              <option value="">— Select —</option>
+              <option>Rack</option><option>Corporate</option>
+              <option>Agent</option><option>Package</option><option>Complimentary</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Rate Offered</label>
+            <input type="text" id="f_rate" placeholder="e.g. ₹8500 CP">
+          </div>
+          <div class="field">
+            <label>Ad Campaign</label>
+            <input type="text" id="f_campaign" placeholder="Campaign name">
+          </div>
+          <div class="field">
+            <label>Referral By</label>
+            <input type="text" id="f_referral" placeholder="Who referred">
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS -->
+      <div class="card">
+        <div class="card-title">Status & Assignment</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Agent <span class="req">*</span></label>
+            <select id="f_agent" onchange="updateStrip()">
+              <option value="">— Select —</option>
+              <option>Sushant</option><option>Priyal</option><option>Preeti</option>
+              <option>Dominic</option><option>Maruti</option><option>Sahadev</option>
+              <option>Shivani</option><option>Shobha</option><option>Vinay</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Quality <span class="req">*</span></label>
+            <select id="f_quality" onchange="updateStrip()">
+              <option value="">— Select —</option>
+              <option>Qualified</option><option selected>Seeking Info</option><option>Unqualified</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status <span class="req">*</span></label>
+            <select id="f_status" onchange="updateStrip()">
+              <option value="">— Select —</option>
+              <option selected>Open</option><option>On Hold</option>
+              <option>Confirmed</option><option>Closed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Follow Up On</label>
+            <input type="date" id="f_followupon">
+          </div>
+          <div class="field">
+            <label>Follow Up By</label>
+            <input type="text" id="f_followupby" placeholder="Who follows up">
+          </div>
+          <div class="field">
+            <label>Reason</label>
+            <input type="text" id="f_reason" placeholder="If closed">
+          </div>
+        </div>
+        <div class="grid1" style="margin-top:10px">
+          <div class="field">
+            <label>Remarks</label>
+            <textarea id="f_remarks" placeholder="Additional notes…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <button class="add-btn" id="addBtn" onclick="addToQueue()">+ Add to Queue</button>
+
+    </div><!-- end formPanel -->
+
+    <!-- QUEUE -->
+    <div id="queueSection">
+      <div class="queue-hdr">
+        <div class="queue-title">Queue (<span id="queueCountInline">0</span>)</div>
+        <button class="submit-btn" id="submitBtn" onclick="submitAll()" disabled>
+          ✓ Submit All
+        </button>
+      </div>
+      <div id="queueList">
+        <div class="empty-queue">No enquiries queued yet.</div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end appMain -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+var AGENTS = ['Sushant','Priyal','Preeti','Dominic','Maruti','Sahadev','Shivani','Shobha','Vinay'];
+var MANDATORY = ['f_resort','f_source','f_guest','f_phone','f_agent','f_quality','f_status'];
+var MANDATORY_LABELS = {
+  f_resort:'Resort', f_source:'Source', f_guest:'Guest',
+  f_phone:'Phone', f_agent:'Agent', f_quality:'Quality', f_status:'Status'
+};
+
+var sessionAgent = '';
+var queue = [];
+var editIdx = null;
+var mediaRecorder = null;
+var audioChunks = [];
+var isRecording = false;
+var timerInterval = null;
+var recSeconds = 0;
+var lastAudioBlob = null;
+
+// ── AGENT SELECT ──────────────────────────────────────────────
+(function initAgentGrid() {
+  var grid = document.getElementById('agentGrid');
+  AGENTS.forEach(function(a) {
+    var btn = document.createElement('button');
+    btn.className = 'agent-btn';
+    btn.textContent = a;
+    btn.onclick = function() { selectAgent(a); };
+    grid.appendChild(btn);
+  });
+})();
+
+function selectAgent(name) {
+  sessionAgent = name;
+  document.getElementById('agentScreen').style.display = 'none';
+  document.getElementById('appMain').style.display = 'block';
+  document.getElementById('headerAgent').textContent = name;
+  document.getElementById('f_agent').value = name;
+  updateStrip();
+}
+
+// ── MODE SWITCH ───────────────────────────────────────────────
+function switchMode(mode) {
+  document.getElementById('btnVoice').classList.toggle('active', mode==='voice');
+  document.getElementById('btnForm').classList.toggle('active', mode==='form');
+  document.getElementById('voicePanel').classList.toggle('active', mode==='voice');
+  if (mode === 'form') document.getElementById('formPanel').scrollIntoView({behavior:'smooth'});
+}
+
+// ── VOICE RECORDING ───────────────────────────────────────────
+async function toggleRec() {
+  if (isRecording) stopRec();
+  else await startRec();
+}
+
+async function startRec() {
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = function() {
+      lastAudioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+      document.getElementById('transcriptBox').textContent =
+        '✓ Recording complete (' + recSeconds + 's). Click "Parse with Gemini AI" to extract details.';
+      document.getElementById('transcriptBox').classList.add('has-text');
+      document.getElementById('parseBtn').disabled = false;
+      stream.getTracks().forEach(function(t){ t.stop(); });
+    };
+
+    mediaRecorder.start(1000);
+    isRecording = true;
+    recSeconds = 0;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micCard').classList.add('recording');
+    document.getElementById('micLabel').textContent = 'Recording… tap to stop';
+    document.getElementById('parseBtn').disabled = true;
+
+    timerInterval = setInterval(function() {
+      recSeconds++;
+      var m = Math.floor(recSeconds/60), s = recSeconds%60;
+      document.getElementById('recTimer').textContent = m + ':' + (s<10?'0':'') + s;
+    }, 1000);
+
+  } catch(err) {
+    showToast('Microphone access denied: ' + err.message, 'err');
+  }
+}
+
+function stopRec() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  isRecording = false;
+  clearInterval(timerInterval);
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('micCard').classList.remove('recording');
+  document.getElementById('micLabel').textContent = 'Tap to record';
+}
+
+// ── PARSE VIA GEMINI (through GAS backend) ───────────────────
+async function parseAudio() {
+  if (!lastAudioBlob) return;
+
+  setStatus('loading', 'Sending to Gemini AI…');
+  document.getElementById('parseBtnText').innerHTML = '<span class="spinner"></span> Parsing…';
+  document.getElementById('parseBtn').disabled = true;
+
+  try {
+    var arrayBuffer = await lastAudioBlob.arrayBuffer();
+    var uint8Array  = new Uint8Array(arrayBuffer);
+    var binary = '';
+    for (var i=0; i<uint8Array.length; i++) binary += String.fromCharCode(uint8Array[i]);
+    var base64 = btoa(binary);
+
+    var result = await callBackend({
+      action: 'transcribe',
+      audioBase64: base64,
+      mimeType: lastAudioBlob.type || 'audio/webm'
+    });
+
+    if (result.success && result.data) {
+      fillForm(result.data);
+      setStatus('success', 'Parsed — review and correct if needed');
+      switchMode('form');
+      setTimeout(function(){
+        document.getElementById('formPanel').scrollIntoView({behavior:'smooth'});
+      }, 200);
+    } else {
+      setStatus('error', 'Parse failed: ' + (result.error || 'Unknown error'));
+    }
+  } catch(err) {
+    setStatus('error', 'Error: ' + err.message);
+  }
+
+  document.getElementById('parseBtnText').textContent = '✦ Parse with Gemini AI';
+  document.getElementById('parseBtn').disabled = false;
+}
+
+// ── CALL GAS BACKEND ──────────────────────────────────────────
+async function callBackend(payload) {
+  var url = '<?= ScriptApp.getService().getUrl() ?>';
+  var resp = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'text/plain' }
+  });
+  return await resp.json();
+}
+
+// ── FILL FORM ─────────────────────────────────────────────────
+function fillForm(p) {
+  var map = {
+    f_resort: p.resort, f_source: p.source,
+    f_checkin: p.checkin, f_checkout: p.checkout,
+    f_rooms: p.rooms, f_roomcat: p.room_category,
+    f_mealplan: p.meal_plan, f_addons: p.addons,
+    f_guest: p.guest_name, f_phone: p.phone,
+    f_email: p.email, f_agency: p.agency,
+    f_adults: p.adults, f_kids: p.kids, f_infants: p.infants,
+    f_segment: p.segment, f_type: p.type, f_ratetype: p.rate_type,
+    f_campaign: p.campaign, f_referral: p.referral,
+    f_rate: p.rate_offered,
+    f_agent: p.agent || sessionAgent,
+    f_quality: p.quality || 'Seeking Info',
+    f_status: p.status || 'Open',
+    f_remarks: p.remarks,
+    f_followupon: p.follow_up_on, f_followupby: p.follow_up_by,
+    f_reason: p.reason
+  };
+  for (var id in map) {
+    var el = document.getElementById(id);
+    if (el && map[id]) { el.value = map[id]; el.classList.add('ai'); }
+  }
+  updateStrip();
+}
+
+// ── MANDATORY STRIP ───────────────────────────────────────────
+function updateStrip() {
+  var strip = document.getElementById('reqStrip');
+  strip.innerHTML = '';
+  MANDATORY.forEach(function(id) {
+    var val = document.getElementById(id).value.trim();
+    var chip = document.createElement('div');
+    chip.className = 'req-chip ' + (val ? 'ok' : 'bad');
+    chip.textContent = (val ? '✓ ' : '○ ') + MANDATORY_LABELS[id];
+    strip.appendChild(chip);
+  });
+}
+
+function setStatus(type, text) {
+  var bar = document.getElementById('statusBar');
+  bar.className = 'status-bar visible ' + type;
+  document.getElementById('statusIcon').textContent =
+    type==='loading' ? '⟳' : type==='error' ? '✕' : '✓';
+  document.getElementById('statusText').textContent = text;
+}
+
+// ── QUEUE ─────────────────────────────────────────────────────
+function addToQueue() {
+  var missing = MANDATORY.filter(function(id){ return !document.getElementById(id).value.trim(); });
+  if (missing.length) {
+    showToast('Fill required: ' + missing.map(function(id){ return MANDATORY_LABELS[id]; }).join(', '), 'err');
+    return;
+  }
+  var enq = collectForm();
+  if (editIdx !== null) {
+    queue[editIdx] = enq; editIdx = null;
+    document.getElementById('addBtn').textContent = '+ Add to Queue';
+  } else {
+    queue.push(enq);
+  }
+  clearForm();
+  renderQueue();
+  showToast('Added to queue (' + queue.length + ')', 'ok');
+  document.getElementById('queueSection').scrollIntoView({behavior:'smooth'});
+}
+
+function collectForm() {
+  return {
+    resort: v('f_resort'), source: v('f_source'),
+    checkin: v('f_checkin'), checkout: v('f_checkout'),
+    rooms: v('f_rooms'), room_category: v('f_roomcat'),
+    meal_plan: v('f_mealplan'), addons: v('f_addons'),
+    guest_name: v('f_guest'), phone: v('f_phone'),
+    email: v('f_email'), agency: v('f_agency'),
+    adults: v('f_adults'), kids: v('f_kids'), infants: v('f_infants'),
+    segment: v('f_segment'), type: v('f_type'), rate_type: v('f_ratetype'),
+    campaign: v('f_campaign'), referral: v('f_referral'),
+    rate_offered: v('f_rate'), agent: v('f_agent'),
+    quality: v('f_quality'), status: v('f_status'),
+    remarks: v('f_remarks'), follow_up_on: v('f_followupon'),
+    follow_up_by: v('f_followupby'), reason: v('f_reason')
+  };
+}
+
+function v(id) { return document.getElementById(id).value; }
+
+function clearForm() {
+  ['f_resort','f_source','f_checkin','f_checkout','f_rooms','f_roomcat','f_mealplan',
+   'f_addons','f_guest','f_phone','f_email','f_agency','f_adults','f_kids','f_infants',
+   'f_segment','f_type','f_ratetype','f_campaign','f_referral','f_rate',
+   'f_remarks','f_followupon','f_followupby','f_reason'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('ai'); }
+  });
+  document.getElementById('f_agent').value = sessionAgent;
+  document.getElementById('f_quality').value = 'Seeking Info';
+  document.getElementById('f_status').value = 'Open';
+  document.getElementById('statusBar').className = 'status-bar';
+  lastAudioBlob = null;
+  document.getElementById('transcriptBox').textContent = 'Recording will appear here after you stop…';
+  document.getElementById('transcriptBox').classList.remove('has-text');
+  document.getElementById('parseBtn').disabled = true;
+  updateStrip();
+}
+
+function renderQueue() {
+  var n = queue.length;
+  document.getElementById('queueCount').textContent = n;
+  document.getElementById('queueCountInline').textContent = n;
+  document.getElementById('submitBtn').disabled = n===0;
+  var list = document.getElementById('queueList');
+  if (n===0) { list.innerHTML = '<div class="empty-queue">No enquiries queued yet.</div>'; return; }
+  list.innerHTML = '';
+  queue.forEach(function(q, i) {
+    var chips = [];
+    if (q.checkin)  chips.push('<span class="q-chip"><strong>In:</strong> ' + fmtDate(q.checkin) + '</span>');
+    if (q.checkout) chips.push('<span class="q-chip"><strong>Out:</strong> ' + fmtDate(q.checkout) + '</span>');
+    if (q.rooms)    chips.push('<span class="q-chip"><strong>Rooms:</strong> ' + q.rooms + '</span>');
+    if (q.adults)   chips.push('<span class="q-chip"><strong>Adults:</strong> ' + q.adults + '</span>');
+    if (q.source)   chips.push('<span class="q-chip">' + q.source + '</span>');
+    if (q.agent)    chips.push('<span class="q-chip">' + q.agent + '</span>');
+    if (q.status)   chips.push('<span class="q-chip">' + q.status + '</span>');
+    list.innerHTML +=
+      '<div class="q-card">' +
+        '<div class="q-card-top">' +
+          '<div><div class="q-resort">' + (i+1) + '. ' + q.resort + '</div>' +
+          '<div class="q-guest">' + q.guest_name + (q.phone ? ' · ' + q.phone : '') + '</div></div>' +
+          '<div class="q-actions">' +
+            '<button class="q-edit" onclick="editEnq(' + i + ')">Edit</button>' +
+            '<button class="q-del"  onclick="delEnq(' + i + ')">Delete</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="q-chips">' + chips.join('') + '</div>' +
+      '</div>';
+  });
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  var p = d.split('-');
+  return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0] : d;
+}
+
+function editEnq(i) {
+  var q = queue[i];
+  var map = {
+    f_resort: q.resort, f_source: q.source, f_checkin: q.checkin, f_checkout: q.checkout,
+    f_rooms: q.rooms, f_roomcat: q.room_category, f_mealplan: q.meal_plan, f_addons: q.addons,
+    f_guest: q.guest_name, f_phone: q.phone, f_email: q.email, f_agency: q.agency,
+    f_adults: q.adults, f_kids: q.kids, f_infants: q.infants,
+    f_segment: q.segment, f_type: q.type, f_ratetype: q.rate_type,
+    f_campaign: q.campaign, f_referral: q.referral, f_rate: q.rate_offered,
+    f_agent: q.agent, f_quality: q.quality, f_status: q.status,
+    f_remarks: q.remarks, f_followupon: q.follow_up_on,
+    f_followupby: q.follow_up_by, f_reason: q.reason
+  };
+  for (var id in map) { var el = document.getElementById(id); if (el) el.value = map[id]||''; }
+  editIdx = i;
+  document.getElementById('addBtn').textContent = '✓ Update Enquiry #' + (i+1);
+  updateStrip();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function delEnq(i) {
+  if (!confirm('Delete enquiry #' + (i+1) + ' for ' + queue[i].resort + '?')) return;
+  queue.splice(i, 1);
+  if (editIdx === i) { editIdx = null; document.getElementById('addBtn').textContent = '+ Add to Queue'; }
+  renderQueue();
+}
+
+// ── SUBMIT ALL ────────────────────────────────────────────────
+async function submitAll() {
+  if (!queue.length) return;
+  if (!confirm('Submit ' + queue.length + ' enquiry/enquiries to Resort Enquiry Sheet?')) return;
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').innerHTML = '<span class="spinner"></span> Submitting…';
+
+  try {
+    var result = await callBackend({
+      action: 'submit',
+      enquiries: queue,
+      agent: sessionAgent
+    });
+
+    if (result.success) {
+      var ok  = result.results.filter(function(r){ return r.success; }).length;
+      var bad = result.results.filter(function(r){ return !r.success; });
+      if (bad.length === 0) {
+        queue = []; renderQueue();
+        showToast('✓ ' + ok + ' enquiry/enquiries submitted!', 'ok');
+      } else {
+        showToast(ok + ' submitted, ' + bad.length + ' failed: ' + bad.map(function(r){ return r.error; }).join(', '), 'err');
+      }
+    } else {
+      showToast('Submit failed: ' + result.error, 'err');
+    }
+  } catch(err) {
+    showToast('Error: ' + err.message, 'err');
+  }
+
+  document.getElementById('submitBtn').innerHTML = '✓ Submit All';
+  document.getElementById('submitBtn').disabled = queue.length === 0;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  setTimeout(function(){ t.className = 'toast'; }, 3500);
+}
+
+function scrollToQueue() {
+  document.getElementById('queueSection').scrollIntoView({behavior:'smooth'});
+}
+
+// INIT
+updateStrip();
+</script>
+</body>
+</html>
