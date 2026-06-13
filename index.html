@@ -732,7 +732,7 @@ async function parseAudio() {
 
 // ── CALL GAS BACKEND ──────────────────────────────────────────
 async function callBackend(payload) {
-  var url = '<?= ScriptApp.getService().getUrl() ?>';
+  var url = 'https://script.google.com/macros/s/AKfycbxaN2SMM6U7oCcY2izSHkrhocsJwCQW4NoGsV_N0MFR0pUPUQMg2qkG7CaM65XtM_yrsw/exec';
   var resp = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
