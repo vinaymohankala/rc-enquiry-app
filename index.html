@@ -752,12 +752,14 @@ async function parseAudio() {
     });
 
     var data = await response.json();
+    console.log('API response:', JSON.stringify(data).substring(0,500));
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     var text = data.content && data.content[0] ? data.content[0].text : '';
+    console.log('Claude text:', text);
     var clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
-    // Find first { to last }
     var start = clean.indexOf('{');
     var end   = clean.lastIndexOf('}');
-    if (start === -1 || end === -1) throw new Error('No JSON in response: ' + clean.substring(0,100));
+    if (start === -1 || end === -1) throw new Error('No JSON in response: ' + clean.substring(0,200));
     var parsed = JSON.parse(clean.substring(start, end+1));
 
     fillForm(parsed);
