@@ -733,9 +733,7 @@ async function parseAudio() {
     'Convert relative dates to YYYY-MM-DD. Extract phone digits only. ' +
     'Return ONLY valid JSON no markdown: ' +
     '{"resort":"","source":"","checkin":"","checkout":"","rooms":"","room_category":"","meal_plan":"","addons":"","guest_name":"","phone":"","email":"","agency":"","adults":"","kids":"","infants":"","segment":"","type":"","rate_type":"","campaign":"","referral":"","rate_offered":"","agent":"","quality":"Seeking Info","status":"Open","remarks":"","follow_up_on":"","follow_up_by":"","reason":""}' +
-    '
-
-Transcript: "' + transcript + '"';
+    '\nTranscript: "' + transcript + '"';
 
   try {
     var response = await fetch('https://api.anthropic.com/v1/messages', {
