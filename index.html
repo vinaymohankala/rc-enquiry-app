@@ -755,9 +755,12 @@ Transcript: "' + transcript + '"';
 
     var data = await response.json();
     var text = data.content && data.content[0] ? data.content[0].text : '';
-    var jsonMatch = text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON in response: ' + text.substring(0,100));
-    var parsed = JSON.parse(jsonMatch[0]);
+    var clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
+    // Find first { to last }
+    var start = clean.indexOf('{');
+    var end   = clean.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON in response: ' + clean.substring(0,100));
+    var parsed = JSON.parse(clean.substring(start, end+1));
 
     fillForm(parsed);
     setStatus('success', 'Parsed — review and correct if needed');
