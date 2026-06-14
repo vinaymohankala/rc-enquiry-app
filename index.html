@@ -627,6 +627,7 @@ function selectAgent(name) {
   document.getElementById('appMain').style.display = 'block';
   document.getElementById('headerAgent').textContent = name;
   document.getElementById('f_agent').value = name;
+  document.getElementById('f_enquiry_date').value = todayISO();
   updateStrip();
 }
 
@@ -864,6 +865,7 @@ function clearForm() {
   });
   document.getElementById('f_mealplan').value = '';
   document.getElementById('f_agent').value = sessionAgent;
+  document.getElementById('f_enquiry_date').value = todayISO();
   document.getElementById('f_quality').value = 'Seeking Info';
   document.getElementById('f_status').value = 'Open';
   document.getElementById('statusBar').className = 'status-bar';
