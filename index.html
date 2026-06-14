@@ -594,7 +594,7 @@ var MANDATORY_LABELS = {
   f_agent:'Agent', f_quality:'Quality', f_status:'Status'
 };
 
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbwN1eP0SMG6jUuuWrj2nev-FHKI9O40XUVFLE0LCFrXAyYcI70n0MIWY42JVrRljCbwEw/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwOeaNSTPo12qEBkHsG8MTGg0OaibIZuvjny7b8nauUNEINo1zkgmZZTGfODCVJ1quH_A/exec';
 
 var sessionAgent = '';
 var queue = [];
@@ -742,7 +742,7 @@ async function parseAudio() {
 
 // ── CALL GAS BACKEND ──────────────────────────────────────────
 async function callBackend(payload) {
-  var url = 'https://script.google.com/macros/s/AKfycbwN1eP0SMG6jUuuWrj2nev-FHKI9O40XUVFLE0LCFrXAyYcI70n0MIWY42JVrRljCbwEw/exec';
+  var url = 'https://script.google.com/macros/s/AKfycbwOeaNSTPo12qEBkHsG8MTGg0OaibIZuvjny7b8nauUNEINo1zkgmZZTGfODCVJ1quH_A/exec';
   var resp = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
