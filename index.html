@@ -382,6 +382,10 @@ select {
         <div class="card-title">Enquiry Details</div>
         <div class="grid2">
           <div class="field">
+            <label>Enquiry Date</label>
+            <input type="date" id="f_enquiry_date">
+          </div>
+          <div class="field">
             <label>Resort <span class="req">*</span></label>
             <select id="f_resort" onchange="updateStrip()">
               <option value="">— Select —</option>
@@ -758,7 +762,11 @@ async function callBackend(payload) {
 }
 
 // ── FILL FORM ─────────────────────────────────────────────────
-function fillForm(p) {
+function todayISO() {
+  var d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+  function fillForm(p) {
   var map = {
     f_resort: p.resort, f_source: p.source,
     f_checkin: p.checkin, f_checkout: p.checkout,
@@ -773,6 +781,7 @@ function fillForm(p) {
     f_agent: p.agent || sessionAgent,
     f_quality: p.quality || 'Seeking Info',
     f_status: p.status || 'Open',
+    f_enquiry_date: p.enquiry_date || todayISO(),
     f_remarks: p.remarks,
     f_followupon: p.follow_up_on, f_followupby: p.follow_up_by,
     f_reason: p.reason
@@ -838,7 +847,7 @@ function collectForm() {
     campaign: v('f_campaign'), referral: v('f_referral'),
     rate_offered: v('f_rate'), agent: v('f_agent'),
     quality: v('f_quality'), status: v('f_status'),
-    remarks: v('f_remarks'), follow_up_on: v('f_followupon'),
+    remarks: v('f_remarks'), enquiry_date: v('f_enquiry_date'),follow_up_on: v('f_followupon'),
     follow_up_by: v('f_followupby'), reason: v('f_reason')
   };
 }
@@ -849,7 +858,7 @@ function clearForm() {
   ['f_resort','f_source','f_checkin','f_checkout','f_rooms','f_roomcat',
    'f_addons','f_guest','f_phone','f_email','f_agency','f_adults','f_kids','f_infants',
    'f_segment','f_type','f_ratetype','f_campaign','f_referral','f_rate',
-   'f_remarks','f_followupon','f_followupby','f_reason'].forEach(function(id){
+   'f_enquiry_date','f_remarks','f_followupon','f_followupby','f_reason'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) { el.value = ''; el.classList.remove('ai'); }
   });
@@ -912,7 +921,7 @@ function editEnq(i) {
     f_adults: q.adults, f_kids: q.kids, f_infants: q.infants,
     f_segment: q.segment, f_type: q.type, f_ratetype: q.rate_type,
     f_campaign: q.campaign, f_referral: q.referral, f_rate: q.rate_offered,
-    f_agent: q.agent, f_quality: q.quality, f_status: q.status,
+    f_enquiry_date: q.enquiry_date,f_agent: q.agent, f_quality: q.quality, f_status: q.status,
     f_remarks: q.remarks, f_followupon: q.follow_up_on,
     f_followupby: q.follow_up_by, f_reason: q.reason
   };
