@@ -443,11 +443,11 @@ select {
         <div class="card-title">Guest Details</div>
         <div class="grid2">
           <div class="field">
-            <label>Guest / TA Name <span class="req">*</span></label>
+            <label>Guest / TA Name</label>
             <input type="text" id="f_guest" placeholder="Full name" oninput="updateStrip()">
           </div>
           <div class="field">
-            <label>Contact No <span class="req">*</span></label>
+            <label>Contact No</label>
             <input type="tel" id="f_phone" placeholder="Mobile number" oninput="updateStrip()">
           </div>
           <div class="field">
@@ -588,13 +588,13 @@ select {
 
 <script>
 var AGENTS = ['Sushant','Priyal','Preeti','Dominic','Maruti','Sahadev','Shivani','Shobha','Vinay'];
-var MANDATORY = ['f_resort','f_source','f_guest','f_phone','f_agent','f_quality','f_status'];
+var MANDATORY = ['f_resort','f_source','f_agent','f_quality','f_status'];
 var MANDATORY_LABELS = {
-  f_resort:'Resort', f_source:'Source', f_guest:'Guest',
-  f_phone:'Phone', f_agent:'Agent', f_quality:'Quality', f_status:'Status'
+  f_resort:'Resort', f_source:'Source',
+  f_agent:'Agent', f_quality:'Quality', f_status:'Status'
 };
 
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbzQd3ZZN66KLHBX8oyr4A_wnsVDGhSzzPtXloPcldOF_ybU7D_H8rkew6LtVrZcrFwP2A/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwN1eP0SMG6jUuuWrj2nev-FHKI9O40XUVFLE0LCFrXAyYcI70n0MIWY42JVrRljCbwEw/exec';
 
 var sessionAgent = '';
 var queue = [];
@@ -742,7 +742,7 @@ async function parseAudio() {
 
 // ── CALL GAS BACKEND ──────────────────────────────────────────
 async function callBackend(payload) {
-  var url = 'https://script.google.com/macros/s/AKfycbzQd3ZZN66KLHBX8oyr4A_wnsVDGhSzzPtXloPcldOF_ybU7D_H8rkew6LtVrZcrFwP2A/exec';
+  var url = 'https://script.google.com/macros/s/AKfycbwN1eP0SMG6jUuuWrj2nev-FHKI9O40XUVFLE0LCFrXAyYcI70n0MIWY42JVrRljCbwEw/exec';
   var resp = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
