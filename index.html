@@ -23,7 +23,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font); background: var(--bg); color: var(--ink); font-size: 14px; }
 
-/* AGENT SELECT SCREEN */
 .agent-screen {
   min-height: 100vh;
   display: flex; align-items: center; justify-content: center;
@@ -66,7 +65,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); font-
   color: white;
 }
 
-/* HEADER */
 .header {
   background: var(--ink); color: white;
   padding: 12px 16px;
@@ -87,10 +85,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); font-
   font-size: 12px; font-weight: 600; cursor: pointer;
 }
 
-/* MAIN */
 .main { max-width: 680px; margin: 0 auto; padding: 16px 14px 100px; }
 
-/* MODE TOGGLE */
 .mode-toggle {
   display: flex; background: var(--border);
   border-radius: var(--radius); padding: 3px; margin-bottom: 16px;
@@ -107,7 +103,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); font-
   box-shadow: var(--shadow);
 }
 
-/* VOICE PANEL */
 .panel { display: none; }
 .panel.active { display: block; }
 
@@ -165,7 +160,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); font-
 .parse-btn:hover { background: var(--coral-dk); }
 .parse-btn:disabled { background: var(--border); color: var(--ink-faint); cursor: not-allowed; }
 
-/* STATUS BAR */
 .status-bar {
   padding: 10px 14px;
   border-radius: var(--radius);
@@ -179,7 +173,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); font-
 .status-bar.success { background: #EDF7F2; border: 1px solid #B6E2CF; color: var(--green); }
 .status-bar.error   { background: #FEF3F2; border: 1px solid #FECDCA; color: var(--red); }
 
-/* FORM */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -221,7 +214,6 @@ select {
   padding-right: 26px;
 }
 
-/* MANDATORY STRIP */
 .req-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .req-chip {
   font-size: 11px; padding: 3px 9px;
@@ -231,7 +223,6 @@ select {
 .req-chip.ok  { background: #EDF7F2; color: var(--green); border-color: #B6E2CF; }
 .req-chip.bad { background: #FEF3F2; color: var(--red); border-color: #FECDCA; }
 
-/* ADD BUTTON */
 .add-btn {
   width: 100%; padding: 13px;
   background: var(--ink); color: white;
@@ -241,7 +232,6 @@ select {
 }
 .add-btn:hover { background: #333; }
 
-/* QUEUE */
 .queue-hdr {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 10px;
@@ -289,7 +279,6 @@ select {
 }
 .q-chip strong { color: var(--ink); }
 
-/* TOAST */
 .toast {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   background: var(--ink); color: white;
@@ -328,7 +317,7 @@ select {
   </div>
 </div>
 
-<!-- MAIN APP (hidden until agent selected) -->
+<!-- MAIN APP -->
 <div id="appMain" style="display:none">
 
   <div class="header">
@@ -346,7 +335,6 @@ select {
 
   <div class="main">
 
-    <!-- MODE TOGGLE -->
     <div class="mode-toggle">
       <button class="mode-btn active" id="btnVoice" onclick="switchMode('voice')">
         🎙 Voice Input
@@ -356,7 +344,6 @@ select {
       </button>
     </div>
 
-    <!-- STATUS -->
     <div class="status-bar" id="statusBar">
       <span id="statusIcon">✦</span>
       <span id="statusText"></span>
@@ -385,7 +372,7 @@ select {
       </button>
     </div>
 
-    <!-- FORM (always shown below) -->
+    <!-- FORM PANEL -->
     <div class="panel active" id="formPanel">
 
       <div class="req-strip" id="reqStrip"></div>
@@ -416,9 +403,8 @@ select {
             <label>Source <span class="req">*</span></label>
             <select id="f_source" onchange="updateStrip()">
               <option value="">— Select —</option>
-              <option>Call</option><option>Whatsapp</option><option>Email</option>
-              <option>FB/Insta</option><option>Website</option><option>Referral</option>
-              <option>Meta Ad</option><option>OTA</option><option>Others</option>
+              <option>Call</option><option>Email</option><option>Whatsapp</option>
+              <option>Referral</option><option>Website</option><option>FB/Insta</option>
             </select>
           </div>
           <div class="field">
@@ -439,7 +425,11 @@ select {
           </div>
           <div class="field">
             <label>Meal Plan</label>
-            <input type="text" id="f_mealplan" placeholder="CP / MAP / AP">
+            <select id="f_mealplan">
+              <option value="">— Select —</option>
+              <option>EP</option><option>CP</option><option>MAP</option>
+              <option>AP</option><option>JP</option>
+            </select>
           </div>
           <div class="field">
             <label>Add Ons</label>
@@ -448,7 +438,7 @@ select {
         </div>
       </div>
 
-      <!-- GUEST -->
+      <!-- GUEST DETAILS -->
       <div class="card">
         <div class="card-title">Guest Details</div>
         <div class="grid2">
@@ -484,25 +474,22 @@ select {
             <label>Segment</label>
             <select id="f_segment">
               <option value="">— Select —</option>
-              <option>FIT</option><option>GIT</option><option>MICE</option>
-              <option>Domestic</option><option>International</option>
-              <option>Agent(TA)</option><option>Direct</option>
+              <option>Direct</option><option>TA</option>
+              <option>OTA</option><option>Others</option>
             </select>
           </div>
           <div class="field">
             <label>Type</label>
             <select id="f_type">
               <option value="">— Select —</option>
-              <option>Leisure</option><option>Business</option>
-              <option>Honeymoon</option><option>Family</option><option>Group</option>
+              <option>Domestic</option><option>Inbound</option>
             </select>
           </div>
           <div class="field">
             <label>Rate Type</label>
             <select id="f_ratetype">
               <option value="">— Select —</option>
-              <option>Rack</option><option>Corporate</option>
-              <option>Agent</option><option>Package</option><option>Complimentary</option>
+              <option>Normal</option><option>FAM/Comp</option>
             </select>
           </div>
           <div class="field">
@@ -511,7 +498,10 @@ select {
           </div>
           <div class="field">
             <label>Ad Campaign</label>
-            <input type="text" id="f_campaign" placeholder="Campaign name">
+            <select id="f_campaign">
+              <option value="">— Select —</option>
+              <option>Meta Ad</option><option>Google Ad</option><option>Others</option>
+            </select>
           </div>
           <div class="field">
             <label>Referral By</label>
@@ -520,9 +510,9 @@ select {
         </div>
       </div>
 
-      <!-- STATUS -->
+      <!-- STATUS & ASSIGNMENT -->
       <div class="card">
-        <div class="card-title">Status & Assignment</div>
+        <div class="card-title">Status &amp; Assignment</div>
         <div class="grid2">
           <div class="field">
             <label>Agent <span class="req">*</span></label>
@@ -549,16 +539,21 @@ select {
             </select>
           </div>
           <div class="field">
+            <label>Reason</label>
+            <select id="f_reason">
+              <option value="">— Select —</option>
+              <option>Budget Issue</option><option>Plan Changed</option>
+              <option>Seeking Info</option><option>Unqualified</option>
+              <option>Sold Out</option><option>Others</option>
+            </select>
+          </div>
+          <div class="field">
             <label>Follow Up On</label>
             <input type="date" id="f_followupon">
           </div>
           <div class="field">
             <label>Follow Up By</label>
             <input type="text" id="f_followupby" placeholder="Who follows up">
-          </div>
-          <div class="field">
-            <label>Reason</label>
-            <input type="text" id="f_reason" placeholder="If closed">
           </div>
         </div>
         <div class="grid1" style="margin-top:10px">
@@ -676,7 +671,7 @@ function startRec() {
   };
 
   recognition.onend = function() {
-    if (isRecording) recognition.start(); // restart on pause
+    if (isRecording) recognition.start();
   };
 
   recognition.start();
@@ -708,7 +703,7 @@ function stopRec() {
   }
 }
 
-// ── PARSE TRANSCRIPT VIA GAS BACKEND (Claude API) ───────────
+// ── PARSE TRANSCRIPT ─────────────────────────────────────────
 async function parseAudio() {
   var transcript = finalTranscript.trim() ||
     document.getElementById('transcriptBox').textContent.trim();
@@ -851,18 +846,19 @@ function collectForm() {
 function v(id) { return document.getElementById(id).value; }
 
 function clearForm() {
-  ['f_resort','f_source','f_checkin','f_checkout','f_rooms','f_roomcat','f_mealplan',
+  ['f_resort','f_source','f_checkin','f_checkout','f_rooms','f_roomcat',
    'f_addons','f_guest','f_phone','f_email','f_agency','f_adults','f_kids','f_infants',
    'f_segment','f_type','f_ratetype','f_campaign','f_referral','f_rate',
    'f_remarks','f_followupon','f_followupby','f_reason'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) { el.value = ''; el.classList.remove('ai'); }
   });
+  document.getElementById('f_mealplan').value = '';
   document.getElementById('f_agent').value = sessionAgent;
   document.getElementById('f_quality').value = 'Seeking Info';
   document.getElementById('f_status').value = 'Open';
   document.getElementById('statusBar').className = 'status-bar';
-  lastAudioBlob = null;
+  finalTranscript = '';
   document.getElementById('transcriptBox').textContent = 'Recording will appear here after you stop…';
   document.getElementById('transcriptBox').classList.remove('has-text');
   document.getElementById('parseBtn').disabled = true;
