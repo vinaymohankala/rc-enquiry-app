@@ -393,7 +393,7 @@ select {
                 <option>Abbotsford</option><option>BBTG</option><option>Bijapur</option>
                 <option>Devra</option><option>Eagles Nest</option><option>Hoongla</option>
                 <option>Nine Furlongs</option><option>Parvada</option><option>RNK</option>
-                <option>Sariska</option><option>Satya Andamans</option><option>Satya 6</option>
+                <option>Sariska</option><option>Satya Andaman</option><option>Satya 6</option>
                 <option>Singinawa</option><option>The Sen</option><option>Varenya</option>
               </optgroup>
               <optgroup label="Sales &amp; Marketing">
@@ -598,7 +598,7 @@ var MANDATORY_LABELS = {
   f_agent:'Agent', f_quality:'Quality', f_status:'Status'
 };
 
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbxWnN3QjkDbxwQaZrWR7uCnYhsCLayIzPgvDFtSEZHSkbCms-BfaL49_EoWV6vCnqo8hA/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbxn-qEXEHEIhuEC0TPoN9EXE1_EvI3icRcF8UNUOEd5fkEL7Y2s0vtgXmNZAkNa_xc3ug/exec';
 
 var sessionAgent = '';
 var queue = [];
@@ -747,7 +747,7 @@ async function parseAudio() {
 
 // ── CALL GAS BACKEND ──────────────────────────────────────────
 async function callBackend(payload) {
-  var url = 'https://script.google.com/macros/s/AKfycbxWnN3QjkDbxwQaZrWR7uCnYhsCLayIzPgvDFtSEZHSkbCms-BfaL49_EoWV6vCnqo8hA/exec';
+  var url = 'https://script.google.com/macros/s/AKfycbxn-qEXEHEIhuEC0TPoN9EXE1_EvI3icRcF8UNUOEd5fkEL7Y2s0vtgXmNZAkNa_xc3ug/exec';
   var resp = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
