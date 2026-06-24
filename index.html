@@ -531,7 +531,7 @@ select {
             <label>Quality <span class="req">*</span></label>
             <select id="f_quality" onchange="updateStrip()">
               <option value="">— Select —</option>
-              <option>Qualified</option><option selected>Seeking Info</option><option>Unqualified</option>
+              <option>Qualified</option><option selected>Seeking Info Only</option><option>Unqualified</option>
             </select>
           </div>
           <div class="field">
@@ -547,7 +547,7 @@ select {
             <select id="f_reason">
               <option value="">— Select —</option>
               <option>Budget Issue</option><option>Plan Changed</option>
-              <option>Seeking Info</option><option>Unqualified</option>
+              <option>Seeking Info Only</option><option>Unqualified</option>
               <option>Sold Out</option><option>Others</option>
             </select>
           </div>
@@ -780,7 +780,7 @@ function todayISO() {
     f_campaign: p.campaign, f_referral: p.referral,
     f_rate: p.rate_offered,
     f_agent: p.agent || sessionAgent,
-    f_quality: p.quality || 'Seeking Info',
+    f_quality: p.quality || 'Seeking Info Only',
     f_status: p.status || 'Open',
     f_enquiry_date: p.enquiry_date || todayISO(),
     f_remarks: p.remarks,
@@ -866,7 +866,7 @@ function clearForm() {
   document.getElementById('f_mealplan').value = '';
   document.getElementById('f_agent').value = sessionAgent;
   document.getElementById('f_enquiry_date').value = todayISO();
-  document.getElementById('f_quality').value = 'Seeking Info';
+  document.getElementById('f_quality').value = 'Seeking Info Only';
   document.getElementById('f_status').value = 'Open';
   document.getElementById('statusBar').className = 'status-bar';
   finalTranscript = '';
